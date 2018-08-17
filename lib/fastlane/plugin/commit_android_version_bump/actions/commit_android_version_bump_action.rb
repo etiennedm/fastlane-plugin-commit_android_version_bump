@@ -92,11 +92,16 @@ module Fastlane
         begin
             version_code = Actions.lane_context["VERSION_CODE"]
 
-            params[:message] ||= (version_code ? "Version Bump to #{version_code}" : "Version Bump")
+            commit_message ||= params[:message]
+            if commit_message != nil
+                commit_message = commit_message.sub("__version_number__", "#{version_code}")
+            else
+                commit_message = (version_code ? "Version Bump to #{version_code}" : "Version Bump")
+            end
 
-            Actions.sh("git -C #{repo_path} commit -m '#{params[:message]}'")
+            Actions.sh("git -C #{repo_path} commit -m '#{commit_message}'")
 
-            UI.success("Committed \"#{params[:message]}\" 💾.")
+            UI.success("Committed \"#{commit_message}\" 💾.")
         rescue => ex
             UI.error(ex)
 
